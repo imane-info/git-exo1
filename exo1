@@ -1,0 +1,221 @@
+#include<stdio.h>
+#include<stdlib.h>
+typedef struct noeud {
+int valeur;
+struct noeud *suivant;
+}noeud;
+noeud *creer(int val) {
+    noeud *nv = (noeud*)malloc(sizeof(noeud));
+    if (nv) {
+        printf("Erreur d'allocation mémoire\n");
+        return NULL;
+    }
+    nv->valeur = val;
+    nv->suivant = NULL;
+    return nv;
+}
+noeud*ajoutD(noeud*debut,int val){
+    noeud *nv;
+    nv=(noeud*)malloc(sizeof(noeud));
+    nv->valeur=val;
+    nv->suivant=NULL;
+    nv->suivant =debut;
+    debut =nv;
+    }
+
+noeud*ajoutF(noeud *debut,int val){
+    noeud *nv,*p;
+    nv=(noeud*)malloc(sizeof(noeud));
+    nv->valeur=val;
+    nv->suivant=NULL;
+if(debut==NULL){
+    debut=nv;
+}
+    else{
+        while(p->suivant!=NULL){
+            p=p->suivant;
+        }
+        p->suivant=nv;
+
+    }
+
+
+    return nv;
+}
+void afficher(noeud*debut){
+    noeud *P=debut;
+
+    if(debut==NULL){
+        printf("la liste est vide");
+    }
+    else{
+        while(P!=NULL){
+            printf("la valeur est %d\n",P->valeur);
+            P=P->suivant;
+        }
+    }
+}
+void calcul_taille(noeud*debut,int taille){
+    int c=0;
+    noeud*p;
+    p=debut;
+    while(p!=NULL){
+        c++;
+        p=p->suivant;
+    }
+}
+noeud*Ajoutmileu(noeud*debut,int pos,int val){
+    noeud*P,*N;
+    P=(noeud*)malloc(sizeof(noeud));
+    if(P){
+        P->valeur=val;
+        N=debut;
+        while(P!=NULL&& P->valeur!=pos){
+            P=P->suivant;
+        }
+        P->suivant=N->suivant;
+        N->suivant=P;
+
+    }
+}
+void rechercher(noeud*debut,int val){
+    noeud*p=debut;
+    int pos=0;
+    while(p!=NULL){
+        if(p->valeur==val){
+printf("la valeur est trouve");
+pos++;
+if(pos==1){
+    break;
+}
+        }
+        p=p->suivant;
+    }
+
+}
+noeud*suppressionD(noeud*debut){
+    if(debut!=NULL){
+        noeud*p=debut;
+        debut=p->suivant;
+        free(p);
+        return debut;
+    }
+}
+noeud*suppressionF(noeud * debut){
+    noeud*nv=debut;
+    if(debut!=NULL){
+        while(nv->suivant->suivant!=NULL){
+            nv=nv->suivant;
+        }
+        free(nv->suivant);
+        nv->suivant=NULL;
+        return debut;
+    }
+
+
+}
+noeud*suppressionP(noeud *debut,int pos){
+    noeud*p;
+    int taille,i;
+    if(pos<1||pos>taille){
+        printf("la position n'est pas trouve");
+    }
+    else{
+        if(pos==1){
+            suppressionD;
+        }
+        else{
+            for(i=1;i<taille;i++){
+                noeud*p,*N;
+                p=debut;
+                N=p->suivant;
+                p->suivant=N->suivant;
+                free(N);
+
+            }
+        }
+
+        } return debut;
+    }
+
+
+noeud*modifierD(noeud*debut,int val){
+    if(debut){
+        debut->valeur=val;
+        return debut ;
+    }
+}
+noeud*modifierF(noeud*debut,int val){
+    noeud*N;
+    if(debut)
+    {
+        while(N->suivant){
+            N=N->suivant;
+
+        }
+        N->valeur=val;
+        return debut;
+
+    }
+}
+noeud*modifierM(noeud*debut,int val,int pos){
+    noeud*p;
+int taille;
+    if(pos<1||pos>taille){
+        printf("la position pas trouver");
+    }
+    else {
+        for(int i=1;i<taille;i++){
+            p=p->suivant;
+            }
+             p->valeur=val;
+    }
+}
+int main()
+{
+noeud *debut = NULL;
+noeud*P=cree(10);
+noeud *D=cree(20);
+noeud *T=cree(30);
+printf("adresse de noeud debut :%p\n",debut);
+printf("adresse de noeud p :%p\n",P);
+printf("adresse de noeud D :%p\n",D);
+printf("adresse de noeud T :%p\n",T);
+debut=P;
+P->suivant=D;
+D->suivant=T;
+T->suivant=NULL;
+printf("--------------------------------\n");
+printf("adresse du noeud %p \n",debut);
+printf("adresse du noeud p suivant %p \n",P->suivant);
+printf("adresse du noeud D suivant %p \n",D-> suivant);
+printf("adresse du noeud T %p \n",T-> suivant);
+printf("-------------affichage-------------\n");
+afficher(debut);
+debut = ajoutD(debut, 100); 
+ printf("---------------Affichage ajout à la Fin----------------------\n");
+  debut = ajoutF(debut, 200); 
+printf("---------------Recherche----------------------\n");
+ rechercher(debut, 20); 
+printf("---------------Taille de la liste----------------------\n");
+ printf("la taille est %d\n", taille(debut)); 
+printf("---------------Insertion à une position----------------------\n");
+ debut = insertion(debut, 3, 555); 
+printf("---------------Suppression au debut----------------------\n"); debut = suppressionD(debut); 
+printf("---------------Suppression à la fin----------------------\n"); debut = suppressionF(debut); 
+printf("---------------Suppression à une position----------------------\n");
+debut = suppressionP(debut, 4);
+ affiche(debut);
+printf("---------------Modifier---------------");
+
+printf("---------------modifier au debut----------------------\n");
+ debut = modifierD(debut, 2024); 
+printf("---------------Modifier à la fin----------------------\n");
+ debut = modifierF(debut, 2025); 
+printf("---------------Modifier à une position----------------------\n");
+debut = modifierP(debut, 1, 2000); 
+affiche(debut); 
+}
+
+
+
