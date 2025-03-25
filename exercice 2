@@ -1,0 +1,136 @@
+#include<stdio.h>
+#include<stdlib.h>
+typedef struct date{
+    char jour[3];
+    char mois[3];
+    char annee[5];
+}date;
+typedef struct produit{
+    char *nom_produit;
+    char Reference[100];
+    float Montant;
+    date DateAchat;
+}produit;
+typedef struct liste{
+    produit cellule;
+    struct Liste *psuiv;
+}liste;
+liste *creer_liste_produit(){
+    if(debut==NULL){
+        printf("la liste est vide");
+        
+    }
+    return nv;
+}
+int est_vide(liste*debut){
+if(debut==NULL){
+    return 1;
+}
+else{
+    return 0;
+}
+}
+liste*creer_produit(){
+    liste*nv;
+        nv=(liste*)malloc(sizeof(liste));
+        if(nv){
+            printf("entre le nom de produit");
+            scanf("le nom du produit est:%s\n",nv->cellule.nom_produit);
+            printf("entrer la reference");
+            scanf("la reference est :%s\n",nv->cellule.Reference);
+            printf("entrer le montant");
+            scanf("le mntant est :%f\n",&nv->cellule.Montant);
+            printf("entrer la date d_achat");
+            scanf("la date d_achat est %s %s %s",&nv->cellule.DateAchat.jour,&nv->cellule.DateAchat.mois,&nv->DateAchat.annee);
+            nv->psuiv=NULL;
+        }
+}
+void afficher_produit(liste*debut){
+    printf("-----------------produit----------------");
+    printf("nom %s",nv->cellule.nom_produit);
+    printf("la reference :%s\n",nv->cellule.Reference);
+    printf("le mntant :%f\n",nv->cellule.Montant);
+    printf("la date d_achat est %s %s %s",nv->cellule.DateAchat.jour,nv->cellule.DateAchat.mois,nv->DateAchat.annee);
+}
+liste*AjoutD(Liste*debut){
+    Liste*nv;
+    nv=creer_produit;
+    nv->suivant =debut;
+    debut =nv;
+}
+liste*AjoutF(liste*debut){
+    Liste*nv,*p;
+    nv=creer_produit;
+    if(debut==NULL){
+        debut=nv;
+    }
+        else{
+            while(p->suivant!=NULL){
+                p=p->suivant;
+            }
+            p->suivant=nv;
+    
+        }
+}
+void afficher_produits(liste*debut){
+    liste*p;
+    if(debut==NULL){
+        printf("la liste est vide");
+    }
+    else{
+       p=debut; 
+       while(p!=NULL){
+        printf("-----------------produit----------------");
+    printf("nom %s",nv->cellule.nom_produit);
+    printf("la reference :%s\n",nv->cellule.Reference);
+    printf("le mntant :%f\n",nv->cellule.Montant);
+    printf("la date d_achat est %s %s %s",nv->cellule.DateAchat.jour,nv->cellule.DateAchat.mois,nv->DateAchat.annee);
+        p=p->psuiv;
+       }
+    }
+    
+}
+int longueur(liste*debut){
+    int c=0;
+    liste *nv=debut;
+while(nv!=NULL){
+    c++;
+    nv=nv->psuiv;
+} return c;
+}
+void filtrer_date(liste*debut,Date dt){
+    liste *p=debut;
+    if(debut==NULL){
+        printf("liste est vide");
+    }
+    else{
+        while(p){
+            if(strcmp(nv->cellule.DateAchat.jour,dt.jour)==0 && strcmp(nv->cellule.DateAchat.mois,dt.mois)==0 && strcmp(nv->cellule.DateAchat.annee,dt.annee)==0 && )
+            afficher_produit(p);
+
+        }p=p->psuiv;
+    }
+
+}
+liste*supprimer_debut(liste*debut){
+    if(debut!=NULL){
+        noeud*p=debut;
+        debut=p->psuiv;
+        free(p);
+        return debut;
+    }
+}
+void supprimer_fin(liste*debut){
+    noeud*nv=debut;
+    if(debut!=NULL){
+        while(nv->psuiv->psuiv!=NULL){
+            nv=nv->psuiv;
+        }
+        free(nv->psuivt);
+        nv->psuiv=NULL;
+        return debut;
+    }
+}
+liste*rembourser(liste*liste,char *refer){
+    
+}
