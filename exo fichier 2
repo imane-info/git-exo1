@@ -1,0 +1,15 @@
+#include<stdio.h>
+int main(){
+    char ligne[100];
+    FILE*fichier=fopen("C:\\Users\\LENOVO\\Desktop\\text2.txt","r");
+    if(fichier==NULL){
+        printf("erreur");
+        return 1;
+    }
+    printf("contenu du fichier :\n");
+    while(fgets(ligne,sizeof(ligne),fichier)){
+        printf("%s",ligne);
+    }
+    fclose(fichier);
+    printf("donnees enregisterer");
+}
