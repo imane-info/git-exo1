@@ -1,0 +1,200 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct date {
+    char jour[3];
+    char mois[3];
+    char annee[5];
+} date;
+
+typedef struct produit {
+    char *nom_produit;
+    char Reference[100];
+    float Montant;
+    date DateAchat;
+} produit;
+
+typedef struct liste {
+    produit cellule;
+    struct liste *psuiv;
+} liste;
+
+liste* creer_liste_produit() {
+    return NULL;
+}
+
+int est_vide(liste* debut) {
+    return (debut == NULL);
+}
+
+liste* creer_produit() {
+    liste* nv = (liste*)malloc(sizeof(liste));
+    if (nv) {
+        nv->cellule.nom_produit = (char*)malloc(100 * sizeof(char));
+        printf("Entrez le nom du produit : ");
+        scanf("%s", nv->cellule.nom_produit);
+        printf("Entrez la reference : ");
+        scanf("%s", nv->cellule.Reference);
+        printf("Entrez le montant : ");
+        scanf("%f", &nv->cellule.Montant);
+        printf("Entrez la date d'achat (JJ MM AAAA) : ");
+        scanf("%s %s %s", nv->cellule.DateAchat.jour, nv->cellule.DateAchat.mois, nv->cellule.DateAchat.annee);
+        nv->psuiv = NULL;
+    }
+    return nv;
+}
+
+void afficher_produit(liste* nv) {
+    if (nv) {
+        printf("\n----------------- Produit ----------------\n");
+        printf("Nom: %s\n", nv->cellule.nom_produit);
+        printf("Reference: %s\n", nv->cellule.Reference);
+        printf("Montant: %.2f\n", nv->cellule.Montant);
+        printf("Date d'achat: %s/%s/%s\n", nv->cellule.DateAchat.jour, nv->cellule.DateAchat.mois, nv->cellule.DateAchat.annee);
+    }
+}
+
+liste* ajouter_debut(liste* debut) {
+    liste* nv = creer_produit();
+    nv->psuiv = debut;
+    return nv;
+}
+
+liste* ajouter_fin(liste* debut) {
+    liste *nv = creer_produit(), *p = debut;
+    if (!debut) return nv;
+    while (p->psuiv) p = p->psuiv;
+    p->psuiv = nv;
+    return debut;
+}
+
+void afficher_produits(liste* debut) {
+    if (!debut) {
+        printf("La liste est vide\n");
+        return;
+    }
+    liste* p = debut;
+    while (p) {
+        afficher_produit(p);
+        p = p->psuiv;
+    }
+}
+
+int longueur(liste* debut) {
+    int c = 0;
+    while (debut) {
+        c++;
+        debut = debut->psuiv;
+    }
+    return c;
+}
+
+void filtrer_date(liste* debut, date dt) {
+    while (debut) {
+        if (strcmp(debut->cellule.DateAchat.jour, dt.jour) == 0 &&
+            strcmp(debut->cellule.DateAchat.mois, dt.mois) == 0 &&
+            strcmp(debut->cellule.DateAchat.annee, dt.annee) == 0) {
+            afficher_produit(debut);
+        }
+        debut = debut->psuiv;
+    }
+}
+
+liste* supprimer_debut(liste* debut) {
+    if (!debut) return NULL;
+    liste* p = debut;
+    debut = debut->psuiv;
+    free(p->cellule.nom_produit);
+    free(p);
+    return debut;
+}
+
+liste* supprimer_fin(liste* debut) {
+    if (!debut) return NULL;
+    if (!debut->psuiv) {
+        free(debut->cellule.nom_produit);
+        free(debut);
+        return NULL;
+    }
+    liste *p = debut;
+    while (p->psuiv->psuiv) p = p->psuiv;
+    free(p->psuiv->cellule.nom_produit);
+    free(p->psuiv);
+    p->psuiv = NULL;
+    return debut;
+}
+
+liste* rembourser(liste* debut, char *refer) {
+    if (!debut) return NULL;
+    if (strcmp(debut->cellule.Reference, refer) == 0)
+        return supprimer_debut(debut);
+
+    liste *p = debut;
+    while (p->psuiv && strcmp(p->psuiv->cellule.Reference, refer) != 0) {
+        p = p->psuiv;
+    }
+    if (p->psuiv) {
+        liste *tmp = p->psuiv;
+        p->psuiv = tmp->psuiv;
+        free(tmp->cellule.nom_produit);
+        free(tmp);
+    }
+    return debut;
+}
+
+int main() {
+    liste *stock = creer_liste_produit();
+    int choix;
+    char refer[100];
+    date dt;
+
+    do {
+        printf("\nMenu :\n");
+        printf("1. Ajouter un produit au debut\n");
+        printf("2. Ajouter un produit a la fin\n");
+        printf("3. Afficher tous les produits\n");
+        printf("4. Supprimer le premier produit\n");
+        printf("5. Supprimer le dernier produit\n");
+        printf("6. Supprimer un produit par reference\n");
+        printf("7. Afficher les produits achetes a une date\n");
+        printf("8. Quitter\n");
+        printf("Choix : ");
+        scanf("%d", &choix);
+
+        switch (choix) {
+        case 1:
+            stock = ajouter_debut(stock);
+            break;
+        case 2:
+            stock = ajouter_fin(stock);
+            break;
+        case 3:
+            afficher_produits(stock);
+            break;
+        case 4:
+            stock = supprimer_debut(stock);
+            break;
+        case 5:
+            stock = supprimer_fin(stock);
+            break;
+        case 6:
+            printf("Entrez la reference du produit a supprimer : ");
+            scanf("%s", refer);
+            stock = rembourser(stock, refer);
+            break;
+        case 7:
+            printf("Entrez la date (JJ MM AAAA) : ");
+            scanf("%s %s %s", dt.jour, dt.mois, dt.annee);
+            filtrer_date(stock, dt);
+            break;
+        case 8:
+            printf("Programme termine.\n");
+            break;
+        default:
+            printf("Choix invalide, reessayez.\n");
+        }
+    } while (choix != 8);
+
+    return 0;
+}
