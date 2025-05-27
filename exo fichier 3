@@ -1,0 +1,18 @@
+#include<stdio.h>
+int main (){
+
+FILE*src=fopen("C:\\Users\\LENOVO\\Desktop\\text.txt","r");
+FILE*dest=fopen("C:\\Users\\LENOVO\\Desktop\\text2.txt","w");
+if(src==NULL||dest==NULL){
+    printf("erreur");
+    return 1;
+}
+char c;
+while((c=fgetc(src))!=EOF){
+    fputc(c,dest);
+}
+fclose(src);
+fclose(dest);
+printf("copie termine");
+return 0;
+}
