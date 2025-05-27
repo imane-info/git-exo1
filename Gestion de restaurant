@@ -1,0 +1,552 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+typedef struct plat {
+    char nom[23];
+    char description[100];
+    float prix;
+    char categorie[50];
+    int id;
+    float distance;
+} Plat;
+
+
+typedef struct noeud {
+    Plat plat;
+    struct noeud* next;
+    struct noeud* prev;
+} noeud;
+
+
+typedef struct cellule {
+    Plat plat;
+    struct cellule* prev;
+} Cellule;
+typedef Cellule* Pile;
+
+
+typedef struct maillon {
+    Plat plat;
+    struct maillon* next;
+} Maillon;
+typedef struct {
+    Maillon* tete;
+    Maillon* queue;
+} File;
+
+
+void saisir_plat(Plat* p) {
+    printf("Nom du plat: ");
+    fgets(p->nom, sizeof(p->nom), stdin);
+    p->nom[strcspn(p->nom, "\n")] = '\0';  // Supprime le saut de ligne
+
+    printf("Description: ");
+    fgets(p->description, sizeof(p->description), stdin);
+    p->description[strcspn(p->description, "\n")] = '\0';
+
+    printf("Prix: ");
+    scanf("%f", &p->prix);
+    getchar();  // Nettoie le buffer après scanf
+
+    printf("Categorie: ");
+    fgets(p->categorie, sizeof(p->categorie), stdin);
+    p->categorie[strcspn(p->categorie, "\n")] = '\0';
+}
+
+
+void afficher_liste(noeud* tete) {
+    noeud* temp = tete;
+    while (temp != NULL) {
+        printf("Nom: %s \n| Description: %s\n | Prix: %.2f \n | Catégorie: %s\n",
+            temp->plat.nom, temp->plat.description, temp->plat.prix, temp->plat.categorie);
+        temp = temp->next;
+    }
+}
+
+
+
+void empiler(Pile* sommet) {
+    Cellule* nv = (Cellule*)malloc(sizeof(Cellule));
+    if (!nv) return;
+    saisir_plat(&nv->plat);
+    nv->prev = *sommet;
+    *sommet = nv;
+}
+
+
+
+void afficher_pile(Pile sommet) {
+    while (sommet) {
+        printf("----------------------------\n");
+        printf("Nom: %s\nDescription: %s\nPrix: %.2f\nCatégorie: %s\n",
+               sommet->plat.nom, sommet->plat.description,
+               sommet->plat.prix, sommet->plat.categorie);
+        printf("----------------------------\n");
+        sommet = sommet->prev;
+    }
+}
+void ajouter_milieu(noeud** tete) {
+    int position;
+    printf("Entrez la position d'insertion : ");
+    scanf("%d", &position);
+
+    // Création du nouveau nœud
+    noeud* nv = (noeud*)malloc(sizeof(noeud));
+    if (!nv) {
+        printf("Erreur d'allocation mémoire.\n");
+        return;
+    }
+
+    saisir_plat(&nv->plat);  // Saisie des données
+    nv->next = NULL;
+    nv->prev = NULL;
+
+    // Cas 1 : Liste vide ou position <= 1
+    if (*tete == NULL || position <= 1) {
+        nv->next = *tete;
+        if (*tete != NULL) {
+            (*tete)->prev = nv;
+        }
+        *tete = nv;
+        return;
+    }
+
+    // Parcours jusqu'à la position souhaitée
+    noeud* temp = *tete;
+    int i = 1;
+
+    while (temp->next != NULL && i < position - 1) {
+        temp = temp->next;
+        i++;
+    }
+
+    // Insertion après temp
+    nv->next = temp->next;
+    nv->prev = temp;
+
+    if (temp->next != NULL) {
+        temp->next->prev = nv;
+    }
+    temp->next = nv;
+}
+
+void enfiler(File* f) {
+    Maillon* nv = (Maillon*)malloc(sizeof(Maillon));
+    if (!nv) return;
+    saisir_plat(&nv->plat);
+    nv->next = NULL;
+    if (f->queue) {
+        f->queue->next = nv;
+    } else {
+        f->tete = nv;
+    }
+    f->queue = nv;
+}
+
+
+void afficher_file(File f) {
+    Maillon* temp = f.tete;
+    while (temp) {
+        printf("Nom: %s |  Description :%s |Prix: %.2f | \n", temp->plat.nom, temp->plat.prix);
+        temp = temp->next;
+    }
+}
+
+void ajouter_plats(noeud** head, Pile* pile, File* file) {
+    int choix;
+
+    do {
+        printf("\n======= Menu d'Ajout de Plats =======\n");
+        printf("1. Ajouter au début\n");
+        printf("2. Ajouter au milieu (par position)\n");
+        printf("3. Ajouter à la fin\n");
+        printf("4. Retour\n");
+        printf("Entrez votre choix : ");
+        scanf("%d", &choix);
+
+        switch (choix) {
+            case 1:
+                empiler(pile);
+                break;
+            case 2:
+                ajouter_milieu(head);
+                break;
+            case 3:
+                enfiler(file);
+                break;
+            case 4:
+                printf("🔙 Retour au menu principal.\n");
+                break;
+            default:
+                printf("❌ Choix invalide. Veuillez réessayer.\n");
+        }
+
+    } while (choix != 4);
+}
+void rechercherPlat(noeud* tete) {
+    int id;
+    printf("ID du plat à rechercher : ");
+    scanf("%d", &id);
+
+    noeud* temp = tete;
+    while (temp != NULL) {
+        if (temp->plat.id == id) {
+            Plat p = temp->plat;
+            printf("✅ Trouvé : %s - %.2f DH - %s\n", p.nom, p.prix, p.categorie);
+            return;
+        }
+        temp = temp->next;
+    }
+    printf("❌ Plat non trouvé.\n");
+}
+
+
+void modifier_debut(noeud* liste) {
+    if (liste == NULL) {
+        printf("La liste est vide.\n");
+        return;
+    }
+
+    printf("Modification du premier plat :\n");
+    printf("Nom actuel : %s\n", liste->plat.nom);
+    printf("Nouveau nom : ");
+    scanf("%s", liste->plat.nom);
+    printf("Nouvelle description : ");
+    scanf("%s", liste->plat.description);
+    printf("Nouveau prix : ");
+    scanf("%f", &liste->plat.prix);
+    printf("Nouvelle catégorie : ");
+    scanf("%s", liste->plat.categorie);
+
+    printf("Plat du début modifié.\n");
+}
+
+void modifier_milieu(noeud* liste) {
+    if (liste == NULL) {
+        printf("La liste est vide.\n");
+        return;
+    }
+
+    int position, i = 1;
+    printf("Entrez la position du plat à modifier : ");
+    scanf("%d", &position);
+
+    noeud* temp = liste;
+    while (temp != NULL && i < position) {
+        temp = temp->next;
+        i++;
+    }
+
+    if (temp == NULL) {
+        printf("Position invalide. Aucun plat à cette position.\n");
+        return;
+    }
+
+    printf("Modification du plat à la position %d :\n", position);
+    printf("Nom actuel : %s\n", temp->plat.nom);
+    printf("Nouveau nom : ");
+    scanf("%s", temp->plat.nom);
+    printf("Nouvelle description : ");
+    scanf("%s", temp->plat.description);
+    printf("Nouveau prix : ");
+    scanf("%f", &temp->plat.prix);
+    printf("Nouvelle catégorie : ");
+    scanf("%s", temp->plat.categorie);
+
+    printf("Plat modifié.\n");
+}
+void modifier_fin(noeud* liste) {
+    if (liste == NULL) {
+        printf("La liste est vide.\n");
+        return;
+    }
+
+    noeud* temp = liste;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+
+    printf("Modification du dernier plat :\n");
+    printf("Nom actuel : %s\n", temp->plat.nom);
+    printf("Nouveau nom : ");
+    scanf("%s", temp->plat.nom);
+    printf("Nouvelle description : ");
+    scanf("%s", temp->plat.description);
+    printf("Nouveau prix : ");
+    scanf("%f", &temp->plat.prix);
+    printf("Nouvelle catégorie : ");
+    scanf("%s", temp->plat.categorie);
+
+    printf("Plat de fin modifié.\n");
+}
+void menu_modification_plats(noeud* liste) {
+    int choix;
+    
+    do {
+        printf("\n=== MENU MODIFICATION PLAT ===\n");
+        printf("1. Modifier le premier plat\n");
+        printf("2. Modifier un plat au milieu\n");
+        printf("3. Modifier le dernier plat\n");
+        printf("4. Afficher la liste\n");
+        printf("0. Retour\n");
+        printf("Votre choix : ");
+        scanf("%d", &choix);
+        getchar();  // Pour consommer le '\n' restant
+
+        switch (choix) {
+            case 1:
+                modifier_debut(liste);
+                break;
+            case 2:
+                modifier_milieu(liste);
+                break;
+            case 3:
+                modifier_fin(liste);
+                break;
+            case 4:
+                afficher_liste(liste);
+                break;
+            case 0:
+                printf("Retour au menu principal.\n");
+                break;
+            default:
+                printf("Choix invalide. Réessayez.\n");
+        }
+    } while (choix != 0);
+}
+void suppression_debut(Pile *s){
+    if(*s==NULL){
+        printf("la pile est vide\n");
+    }
+    else {
+        Pile t=*s;
+        *s=(*s)->prev;
+        free(t);
+        printf("plat est supprime \n");
+    }
+}
+void suppression_au_milieu(noeud**head,int id){
+    noeud*M=*head;
+    while(M!=NULL && M->plat.id!=id){
+        M=M->next;
+    }
+    if(M->prev!=NULL){
+        M->prev->next=M->next;
+    }
+    else{
+        *head=M->next;
+        if(M->next!=NULL){
+            M->next->prev=M->prev;}
+            free(M);
+            printf("le plat avec id %d est supprimer\n",id );
+        
+    }
+    
+
+}
+void suppression_fin(noeud**head){
+    noeud*n=*head;
+    if(*head){
+        while(n->next!=NULL){
+            n=n->next;
+        }
+        if(n->next!=NULL){
+            n->prev->next=NULL;
+        }
+        else{
+            *head=NULL;
+        }
+        free(n);
+    }
+
+}
+void afficher_categories(noeud** head) {
+    if (*head == NULL) {
+        printf("Aucune catégorie trouvée \n");
+      
+    }
+    
+    
+    noeud* cat = *head;
+
+    while (cat != NULL) {
+        noeud* temp = *head;
+        int trouve = 0;  // compteur pour savoir si la catégorie a déjà été vue
+
+        while (temp != cat && trouve == 0) {
+            if (strcmp(temp->plat.categorie, cat->plat.categorie) == 0) {
+                trouve = 1;  // catégorie déjà vue
+            } else {
+                temp = temp->next;
+            }
+        }
+        
+        if (trouve == 0) {
+            printf(" - %s\n", cat->plat.categorie);
+        }
+        
+        cat = cat->next;
+    }
+}
+void tri(noeud **head) {
+    if (*head == NULL) {
+        printf(" Aucun plat à trier.\n");
+        return;
+    }
+
+    int permute;
+    noeud *ptr;
+    Plat temp;
+
+    do {
+        permute = 0;
+        ptr = *head;
+        while (ptr->next != NULL) {
+            if (ptr->plat.prix > ptr->next->plat.prix) {
+                temp = ptr->plat;
+                ptr->plat = ptr->next->plat;
+                ptr->next->plat = temp;
+                permute = 1;
+            }
+            ptr = ptr->next;
+        }
+    } while (permute);
+
+    printf(" Tri des plats par prix effectué.\n");
+}
+
+   
+
+void Suppression_plats(noeud **head) {
+    int choix, id;
+
+    do {
+        printf("\n======= Suppression de plats =======\n");
+        printf("1. Suppression au début\n");
+        printf("2. Suppression d'un plat spécifique (par ID)\n");
+        printf("3. Suppression à la fin\n");
+        printf("4. Retour\n");
+        printf("Entrez votre choix : ");
+        scanf("%d", &choix);
+
+        switch (choix) {
+            case 1:
+             suppression_debut((Pile *)head);  // ou adapter suppression_debut() si c'est liste
+                break;
+
+            case 2:
+                printf("Entrez id du plat a supprimer : ");
+                scanf("%d", &id);
+                suppression_au_milieu(head, id);
+                break;
+
+            case 3:
+                suppression_fin(head);
+                break;
+
+            case 4:
+                printf("Retour au menu principal.\n");
+                break;
+
+        }
+
+    } while (choix != 4);
+}
+void afficher_plat(Plat p) {
+    printf("\n=== Plat ===\n");
+    printf("ID: %d\n", p.id);
+    printf("Nom: %s\n", p.nom);
+    printf("Description: %s\n", p.description);
+    printf("Prix: %.2f\n", p.prix);
+    printf("Catégorie: %s\n", p.categorie);
+    printf("============\n");
+}
+void lire_fichier() {
+    char ligne[100];
+    FILE* fichier = fopen("C:\\Users\\LENOVO\\Desktop\\text2.txt", "r");
+    
+    if (fichier == NULL) {
+        printf("Erreur: Impossible d'ouvrir le fichier\n");
+        return;
+    }
+    
+    printf("\n=== Contenu du fichier ===\n");
+    while (fgets(ligne, sizeof(ligne), fichier)) {
+        printf("%s", ligne);
+    }
+    
+    fclose(fichier);
+    printf("\nDonnees chargees avec succes\n");
+}
+int main() {
+    noeud* head = NULL;
+    Pile pile = NULL;
+    File file = { NULL, NULL };
+    int choix;
+
+    do {
+        printf("\n=== Menu Principal ===\n");
+        printf("1. Ajouter un plat\n");
+        printf("2. Modifier un plat \n");
+        printf("3. Supprimer un plat\n");
+        printf("4. Rechercher un plat\n");
+        printf("5. Afficher tous les plats\n");
+        printf("6. Afficher catégories disponibles\n");
+        printf("7. Trier plats par prix\n");
+        printf("8. Lire donnees depuis fichier\n");  
+        printf("9. Quitter\n");
+        printf("Choix: ");
+        scanf("%d", &choix);
+
+        switch (choix) {
+            case 1:
+                ajouter_plats(&head, &pile, &file);
+                break;
+
+            case 2:
+                menu_modification_plats(head);
+                break;
+
+            case 3:
+                Suppression_plats(&head);
+                break;
+
+            case 4:
+                rechercherPlat(head);
+                break;
+
+            case 5:
+                {
+                    noeud* current = head;
+                    while (current != NULL) {
+                        afficher_plat(current->plat);
+                        current = current->next;
+                    }
+                }
+                break;
+
+            case 6:
+                afficher_categories(&head);
+                break;
+
+            case 7:
+                tri(&head);
+                break;
+
+            case 8:
+             lire_fichier(); 
+             break;  // Appel de la nouvelle fonction
+            case 9: 
+            printf("Au revoir !\n");
+             break;
+
+            default:
+                printf("❌ Choix invalide.\n");
+        }
+
+    } while (choix != 8);
+
+    return 0;
+}
