@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct noeud {
+    int data;
+    struct noeud *next;
+} noeud;
+
+void ajout(noeud **s, int val) {
+    noeud *p = (noeud*)malloc(sizeof(noeud));
+    if (!p) {
+        printf("Erreur d'allocation mémoire\n");
+        return;
+    }
+    p->data = val;
+    p->next = *s;
+    *s = p;
+}
+
+void pop(noeud **s) {
+    if (*s == NULL) {
+        printf("La pile est vide\n");
+    } else {
+        noeud *p = *s;
+        *s = p->next;
+        printf("Élément %d dépilé\n", p->data);
+        free(p);
+    }
+}
+
+void afficher(noeud **s) {
+    noeud *p = *s;
+    if (p == NULL) {
+        printf("La pile est vide\n");
+        return;
+    }
+    printf("Les éléments de la pile :\n");
+    while (p != NULL) {
+        printf("%d\n", p->data);
+        p = p->next;
+    }
+}
+
+void peek(noeud **s) {
+    if (*s == NULL) {
+        printf("La pile est vide\n");
+    } else {
+        printf("Sommet de la pile : %d\n", (*s)->data);
+    }
+}
+
+int main() {
+    noeud *s = NULL;
+    ajout(&s, 10);
+    ajout(&s, 20);
+    ajout(&s, 30);
+
+    afficher(&s);
+    pop(&s);
+    afficher(&s);
+    peek(&s);
+
+    return 0;
+}
