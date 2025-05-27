@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct noeud {
+    int valeur;
+    struct noeud* next;
+} noeud;
+
+noeud* front = NULL;
+noeud* rear = NULL;
+
+void enfiler(int val) {
+    noeud* p = (noeud*)malloc(sizeof(noeud));
+    if (p == NULL) {
+        printf("Allocation mémoire échouée\n");
+        return;
+    }
+    p->valeur = val;
+    p->next = NULL;
+    if (rear == NULL) {
+        // File vide
+        front = rear = p;
+    } else {
+        rear->next = p;
+        rear = p;
+    }
+}
+
+void defiler() {
+    if (front == NULL) {
+        printf("Erreur : la file est vide\n");
+        return;
+    }
+    noeud* p = front;
+    front = front->next;
+    if (front == NULL) {
+        // File devenue vide
+        rear = NULL;
+    }
+    free(p);
+}
+
+void afficher() {
+    if (front == NULL) {
+        printf("La file est vide\n");
+        return;
+    }
+    noeud* p = front;
+    printf("Contenu de la file : ");
+    while (p != NULL) {
+        printf("%d ", p->valeur);
+        p = p->next;
+    }
+    printf("\n");
+}
+
+void viderFile() {
+    while (front != NULL) {
+        defiler();
+    }
+}
+
+int main() {
+    enfiler(10);
+    enfiler(20);
+    enfiler(30);
+
+    afficher();
+
+    defiler();
+    afficher();
+
+    viderFile();
+    afficher();
+
+    return 0;
+}
